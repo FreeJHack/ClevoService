@@ -99,13 +99,13 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
 
             If (LEqual (Local0, 0xC9))
             {
-                And (AIRP, 0xBF, AIRP) //Settiamo led Airplane per Shift-Lock
+                And (AIRP, 0xBF, AIRP) //Set Airplane led for Shift-Lock
                 Return (Zero)
             }
 
             If (LEqual (Local0, 0xCA))
             {
-                Or (AIRP, 0x40, AIRP) //Restettiamo led Airplane per Shift-Lock
+                Or (AIRP, 0x40, AIRP) //Reset Airplane led for released Shift-Lock
                 Return (Zero)
             }
 
@@ -119,7 +119,7 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
         Name (_HID, EisaId ("PNP0C02"))  // _HID: Hardware ID
         Name (_CID, "MON0000")  // _CID: Compatible ID
         Name (KLVN, Zero)
-        Name (TACH, Package (0x06)  //Aggiungiamo i nostri 3 ventilatori
+        Name (TACH, Package (0x06)  // Add our 3 fans...
         {
             "CPU Fan", 
             "VEN1", 
