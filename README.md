@@ -42,5 +42,5 @@ Rename _Q50 => XQ50
 Keyboard & Fan control through preference panel (time permitting...)
 
 ## Credits
-- Even if this project cannot be considered a fork because it has been completely rewritten using a different approach, a very big thanks deserve [Datasone](https://github.com/datasone/ClevoControl) for the reverse engineering and for discovering FAN and KBD bios commands, giving me a good starting point and saving me a lot of reversing time.
+- A big thanks to [Datasone](https://github.com/datasone/ClevoControl) for the reverse engineering and for discovering FAN and KBD bios commands, giving me a good starting point and saving me a lot of reversing time.
 - [Apple](https://www.apple.com) for macOS  
