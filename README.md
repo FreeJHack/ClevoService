@@ -1,5 +1,6 @@
 # ClevoService
 An open source kernel extension enabling keyboard backlight control for Clevo Hackintosh.
+
 Fully tested on Clevo P9XXEN_EF_ED, but it should even work on most Clevo's laptops provided with full-colour backlight keyboard.
 
 # How it works
@@ -28,9 +29,13 @@ The file also includes the methods to manage the three fans.
 * Install the ClevoService kext into `/Library/Extensions` folder 
 
 The following methods must be patched in clover config.plist ACPI section changing the method name:
-Rename _WAK => XWAK 
+
+Rename _WAK => XWAK
+
     * Comment: _WAK to XWAK, Find: 5F57414B, Replace: 5857414B
+    
 Rename _Q50 => XQ50
+
     * Comment: _Q50 to XQ50, Find: 5F513530, Replace: 58513530
 
 ## Coming Soon...
