@@ -39,9 +39,9 @@ Rename _Q50 => XQ50
 
     * Comment: _Q50 to XQ50, Find: 5F513530, Replace: 58513530
 
-# Coming Soon...
+## Coming Soon...
 Keyboard & Fan control through preference panel (time permitting...)
 
-# Credits
+## Credits
 - A big thanks to [Datasone](https://github.com/datasone/ClevoControl) for the reverse engineering and for discovering FAN and KBD bios commands, giving me a good starting point and saving me a lot of reversing time.
 - [Apple](https://www.apple.com) for macOS  
