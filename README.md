@@ -14,7 +14,7 @@ The following features are supported:
 * Up to 9 preset keyboard backlight colours
 * Airplane led used to indicate Shift-Lock enabled/disabled
 
-The keyboard backlight is fully controlled from numeric keypad according to Clovo's standard keys:
+The keyboard backlight is fully controlled from numeric keypad according to Clevo's standard keys:
 * Change colour with `Fn + "/"`
 * Turn ON/OFF with `Fn + "*"`
 * Decrease backlight with `Fn + "-"`
