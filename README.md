@@ -26,7 +26,8 @@ However, some  DSDT's methods need to be patched in order to properly work with 
 The file also includes the methods to manage the three fans.
 
 * Open the SSDT-CloverService.dsl with MaciASL and save it as `.aml` file into Clover EFI ACPI/patched folder.
-* Install the ClevoService kext into `/Library/Extensions` folder 
+* Install the ClevoService kext into `/Library/Extensions` folder using your preferred kext installer or using terminal
+* Rebuild kext cache and reboot
 
 The following methods must be patched in clover config.plist ACPI section changing the method name:
 
@@ -38,9 +39,9 @@ Rename _Q50 => XQ50
 
     * Comment: _Q50 to XQ50, Find: 5F513530, Replace: 58513530
 
-## Coming Soon...
+# Coming Soon...
 Keyboard & Fan control through preference panel (time permitting...)
 
-## Credits
+# Credits
 - A big thanks to [Datasone](https://github.com/datasone/ClevoControl) for the reverse engineering and for discovering FAN and KBD bios commands, giving me a good starting point and saving me a lot of reversing time.
 - [Apple](https://www.apple.com) for macOS  
