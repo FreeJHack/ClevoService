@@ -1,5 +1,5 @@
 # ClevoService
-An open source kernel extension enabling keyboard backlight control for Clevo Hackintosh.
+An open source kernel extension enabling keyboard backlight & fan control for Clevo Hackintosh.
 
 Fully tested on Clevo P9XXEN_EF_ED, but it should even work on most Clevo's laptops provided with full-colour backlight keyboard.
 
