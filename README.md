@@ -1,6 +1,5 @@
 # ClevoService
 An open source kernel extension enabling keyboard backlight & fan control for Clevo Hackintosh.
-
 Fully tested on Clevo P9XXEN_EF_ED, but it should even work on most Clevo's laptops provided with full-colour backlight keyboard.
 
 # How it works
@@ -31,7 +30,7 @@ The file also includes the methods to manage the three fans.
 
 The following methods must be patched in clover config.plist ACPI section changing the method name:
 
-Rename _WAK => XWAK
+Rename _WAK => XWAK 
 
     * Comment: _WAK to XWAK, Find: 5F57414B, Replace: 5857414B
     
@@ -39,9 +38,9 @@ Rename _Q50 => XQ50
 
     * Comment: _Q50 to XQ50, Find: 5F513530, Replace: 58513530
 
-### Coming Soon...
-Keyboard & Fan control through preference panel (time permitting...)
+ClevoService is using the method DCHU for backlighting and this method should be available in your original DSDT. If missing, search for method WMBB in the device WMI.
+One of both methods must be available in your DSDT otherwise the keyboard backlight won't work.
 
 ### Credits
-- A big thanks to [Datasone](https://github.com/datasone/ClevoControl) for the reverse engineering and for discovering FAN and KBD bios commands, giving me a good starting point and saving me a lot of reversing time.
+- A big thanks deserve [Datasone](https://github.com/datasone/ClevoControl) for the reverse engineering and for discovering FAN and KBD bios commands, giving me a good starting point and saving me a lot of reversing time.
 - [Apple](https://www.apple.com) for macOS  
