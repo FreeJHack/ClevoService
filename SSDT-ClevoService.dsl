@@ -1,22 +1,7 @@
 /*
  * Intel ACPI Component Architecture
- * AML/ASL+ Disassembler version 20180427 (64-bit version)(RM)
+ * AML/ASL+ Disassembler version 20180427 (64-bit version)
  * Copyright (c) 2000 - 2018 Intel Corporation
- * 
- * Disassembling to non-symbolic legacy ASL operators
- *
- * Disassembly of iASLxT6G34.aml, Sat Jun  8 16:22:40 2019
- *
- * Original Table Header:
- *     Signature        "SSDT"
- *     Length           0x000003B2 (946)
- *     Revision         0x01
- *     Checksum         0xF3
- *     OEM ID           "APPLE "
- *     OEM Table ID     "DefMon"
- *     OEM Revision     0x00003000 (12288)
- *     Compiler ID      "INTL"
- *     Compiler Version 0x20180427 (538444839)
  */
 
 DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
@@ -33,8 +18,9 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
     External (_SB_.PCI0.LPCB.EC__.ECOK, IntObj)    // (from opcode)
     External (_SB_.PCI0.LPCB.EC__.OEM4, FieldUnitObj)    // (from opcode)
     External (_SB_.PCI0.LPCB.EC__.XQ50, MethodObj)    // 0 Arguments (from opcode)
-    External (_SB_.PCI0.PEG0.PG00._OFF, MethodObj)    // 0 Arguments (from opcode)
+    External (_SB_.PCI0.PEG0.PEGP._OFF, MethodObj)    // 0 Arguments (from opcode)
     External (_SB_.PCI0.LPCB.PS2K, DeviceObj)    // (from opcode)
+    External (_SB_.WMI.WMBB, MethodObj)    // (from opcode)
     External (XWAK, MethodObj)    // 1 Arguments (from opcode)
 
     Scope (_SB.PCI0.LPCB.EC)
@@ -57,7 +43,7 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
     {
         If (Arg0 == 5) {Arg0 = 4}  //OSX also uses Arg0=5. Force 4 for compatibility...
         // Dual GPU OFF, remove it if not necessary
-        \_SB.PCI0.PEG0.PG00._OFF ()
+        \_SB.PCI0.PEG0.PEGP._OFF ()
         // After a sleep AFLT=1 means battery fail, we need to reset...
         // Remove it if not necessary
         Store (Zero, \_SB.PCI0.LPCB.EC.AFLT)
@@ -99,13 +85,13 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
 
             If (LEqual (Local0, 0xC9))
             {
-                And (AIRP, 0xBF, AIRP) //Set Airplane led for Shift-Lock
+                And (AIRP, 0xBF, AIRP) //Settiamo led Airplane per Shift-Lock
                 Return (Zero)
             }
 
             If (LEqual (Local0, 0xCA))
             {
-                Or (AIRP, 0x40, AIRP) //Reset Airplane led for released Shift-Lock
+                Or (AIRP, 0x40, AIRP) //Restettiamo led Airplane per Shift-Lock
                 Return (Zero)
             }
 
@@ -119,7 +105,7 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
         Name (_HID, EisaId ("PNP0C02"))  // _HID: Hardware ID
         Name (_CID, "MON0000")  // _CID: Compatible ID
         Name (KLVN, Zero)
-        Name (TACH, Package (0x06)  // Add our 3 fans...
+        Name (TACH, Package (0x06)  //Aggiungiamo i nostri 3 ventilatori
         {
             "CPU Fan", 
             "VEN1", 
@@ -181,7 +167,13 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
 
         Method (CLVE, 3, Serialized)
         {
-            \_SB.DCHU.ZEVT (Arg0, Arg1, Arg2)
+            If (CondRefOf( \_SB.DCHU.ZEVT ))   //Vers 1.0.1 17/02/2020
+            {
+                \_SB.DCHU.ZEVT (Arg0, Arg1, Arg2)
+            } elseIf (CondRefOf( \_SB.WMI.WMBB ))  //Added support for WMBB method
+            {
+                \_SB.WMI.WMBB (Arg0, Arg1, Arg2)
+            }
         }
 
         Method (_INI, 0, NotSerialized)  // _INI: Initialize
@@ -189,7 +181,7 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
             // DGPU OFF, Remove it or update path as necessary...
             If (CondRefOf (\_SB.PCI0.PEG0.PG00._OFF))
             {
-                \_SB.PCI0.PEG0.PG00._OFF ()
+                \_SB.PCI0.PEG0.PEGP._OFF ()
             }
 
             If (CondRefOf (\_SB.PCI0.LPCB.EC.AIRP))
