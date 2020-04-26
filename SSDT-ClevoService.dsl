@@ -41,7 +41,7 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
 
     Method (_WAK, 1, Serialized)
     {
-        If (Arg0 == 5) {Arg0 = 4}  //OSX also uses Arg0=5. Force 4 for compatibility...
+        If (Arg0 == 5) {Arg0 = 4}  //OSX also uses Arg0=5. Force 4 for _WAK compatibility...
         // Dual GPU OFF, remove it if not necessary
         \_SB.PCI0.PEG0.PEGP._OFF ()
         // After a sleep AFLT=1 means battery fail, we need to reset...
@@ -51,7 +51,7 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
         // Remove it if not necessary
         Store (One, \_SB.PCI0.LPCB.EC.BAT0)
         Notify (\_SB.CLV0, 0x83) //Set backlight according to settings
-        Return (XWAK (Arg0))  //We're going to call original _WAK method...
+        Return (XWAK (Arg0))     //We're going to call original _WAK method...
     }
 
     Scope (_SB.PCI0.LPCB.EC)
@@ -85,13 +85,13 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
 
             If (LEqual (Local0, 0xC9))
             {
-                And (AIRP, 0xBF, AIRP) //Settiamo led Airplane per Shift-Lock
+                And (AIRP, 0xBF, AIRP) //Set Airplane led for Shift-Lock
                 Return (Zero)
             }
 
             If (LEqual (Local0, 0xCA))
             {
-                Or (AIRP, 0x40, AIRP) //Restettiamo led Airplane per Shift-Lock
+                Or (AIRP, 0x40, AIRP) //Reset Airplane led for Shift-Lock
                 Return (Zero)
             }
 
@@ -105,7 +105,17 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
         Name (_HID, EisaId ("PNP0C02"))  // _HID: Hardware ID
         Name (_CID, "MON0000")  // _CID: Compatible ID
         Name (KLVN, Zero)
-        Name (TACH, Package (0x06)  //Aggiungiamo i nostri 3 ventilatori
+        
+        //If you already have your own .dsl or .aml file,
+        //you can just copy the below CONF package to
+        Name (CONF, Package ()  //AutoDim configuration package
+        {
+            "KbdAutoDimTimerActive", ">y",  //AutoDim Active...
+            "KbdAutoDimActive", ">y",       //Dim activated... set ">n" for OFF
+            "KbdAutoDimTime", 180           //Two minutes, change it as you wish...
+        })
+ 
+        Name (TACH, Package (0x06)          //Add method for the 3 fans...
         {
             "CPU Fan", 
             "VEN1", 

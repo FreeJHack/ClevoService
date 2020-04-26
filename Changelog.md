@@ -1,7 +1,14 @@
 ClevoService Changelog
-====================
+================================
+#### v1.1.0
+- Fully customizable
+- Added Keyboard AutoDim feature
+- Added AutoDim configuration in SSDT-ClevoService.dsl
+- Some minor code clean-up
+- Bump version to 1.1.0 
+
 #### v1.0.0a
-- Added support for WMBB method (Device WMI required) in SSDT-ClevoService.dsl
+- Added support for WMBB method in SSDT-ClevoService.dsl  (Device WMI required in DSDT) 
 - Updated ReadMe file
 - Added Changelog file
 
