@@ -12,8 +12,6 @@ The following features are supported:
 * Backlight automatically set during boot/reboot and sleep/wake
 * Up to 9 preset keyboard backlight different colours
 * Airplane led used to indicate Shift-Lock enabled/disabled
-
-and starting from version 1.1.0+
 * Fully customizable
 * Configurable backlight intensity levels
 * New AutoDim feature, an automatic keyboard backlight dimming including:
