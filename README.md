@@ -35,9 +35,11 @@ Therefore, if the AutoDim is activated with `KbdAutoDimTimerActive = true`, the 
 All the above properties can be modified in the `CONF` method of `CLV0` device included into SSDT-ClevoService.dsl file.
 The boolean values can be set using the well known method `">y"` for true and `">n"` for false. (Thanks RM)
 If the `CONF` method is not found or a property is missing, the loaded default values are the following:
+
  `KbdAutoDimTimerActive = true
  KbdAutoDimActive = true
  KbdAutoDimTime = 180`
+ 
  It is not necessay to change all properties at once, only the needed ones can be changed.
  
  ## Backlight levels configuration 
