@@ -17,6 +17,7 @@ and starting from version 1.1.0+
 * Fully customizable
 * Configurable backlight intensity levels
 * New AutoDim feature, an automatic keyboard backlight dimming including:
+
         - configurable Activation, Dim or OFF and Dimming wait time
         - restore previous backlight intensity on key stroke
         - configuration customizable in SSDT-ClevoService.dsl 
