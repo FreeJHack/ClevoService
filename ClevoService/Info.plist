@@ -25,7 +25,7 @@
 			<key>CFBundleIdentifier</key>
 			<string>${MODULE_NAME}</string>
 			<key>IOClass</key>
-			<string>com_none_ClevoService</string>
+			<string>ClevoService</string>
 			<key>IONameMatch</key>
 			<array>
 				<string>MON0000</string>
@@ -46,6 +46,8 @@
 		<string>9.0.0</string>
 		<key>com.apple.kpi.libkern</key>
 		<string>9.0.0</string>
+		<key>com.apple.iokit.IOHIDFamily</key>
+		<string>1.5</string>
 	</dict>
 </dict>
 </plist>
