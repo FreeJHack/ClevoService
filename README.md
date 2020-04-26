@@ -15,10 +15,9 @@ The following features are supported:
 * Fully customizable
 * Configurable backlight intensity levels
 * New AutoDim feature, an automatic keyboard backlight dimming including:
-
-        - configurable Activation, Dim or OFF and Dimming wait time
-        - restore previous backlight intensity on key stroke
-        - configuration customizable in SSDT-ClevoService.dsl 
+  configurable Activation, Dim or OFF and Dimming wait time
+  restore previous backlight intensity on key stroke
+  configuration customizable in SSDT-ClevoService.dsl 
 
 The keyboard backlight is fully controlled from numeric keypad according to Clevo's standard keys:
 * Change colour with `Fn /`
