@@ -14,10 +14,7 @@ The following features are supported:
 * Airplane led used to indicate Shift-Lock enabled/disabled
 * Fully customizable
 * Configurable backlight intensity levels
-* New AutoDim feature, an automatic keyboard backlight dimming including:
-  configurable Activation, Dim or OFF and Dimming wait time
-  restore previous backlight intensity on key stroke
-  configuration customizable in SSDT-ClevoService.dsl 
+* New AutoDim feature, an automatic keyboard backlight dimming including: configurable Activation, Dim or OFF and Dimming wait time, restore previous backlight intensity on key stroke, configuration customizable in SSDT-ClevoService.dsl 
 
 The keyboard backlight is fully controlled from numeric keypad according to Clevo's standard keys:
 * Change colour with `Fn /`
@@ -34,6 +31,7 @@ The property `KbdAutoDimActive` is used to control whether the keyboard backligh
 The waiting time is set with `KbdAutoDimTime`. The number must be in the range from 5 to 1800 (seconds).
 
 Therefore, if the AutoDim is activated with `KbdAutoDimTimerActive = true`, the keyboard backlight is automatically reduced at the minimum with `KbdAutoDimActive = true`, or completely turned OFF with `KbdAutoDimActive = false`, after the wait time `KbdAutoDimTime`. Pressing any key (Ctrl, Command & Option keys excluded) the backlight intensity is restored.
+
 All the above properties can be modified in the `CONF` method of `CLV0` device included into SSDT-ClevoService.dsl file.
 The boolean values can be set using the well known method `">y"` for true and `">n"` for false. (Thanks RM)
 If the `CONF` method is not found or a property is missing, the loaded default values are the following:
@@ -47,7 +45,7 @@ If the `CONF` method is not found or a property is missing, the loaded default v
  The `CONF` method may also include two properties for controlling the backlight intensity levels, `KbdDimmingLevel` and `KbdLevels`.
  KbdDimmingLevel is the intesity of the backlight when dimmed, if AutoDim is active.
  KbdLevels is an array containing four backlight levels used by ClevoService to chamge the backlight intesity when `Fn -` or `Fn +` keys are pressed.
- Iindex zero is the lowest, three the highest. The value is in the range 0÷255.
+ Index zero is the lowest, three the highest. The value is in the range 0÷255.
  Those properties can be added to the `CONF` method otherwise the default values will be used instead.
  
 # How to install
