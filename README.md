@@ -27,7 +27,7 @@ The AutoDim reduces, or completely turns OFF, the backlight If the keyboard is n
 It is fully controlled from ACPI with three properties: `KbdAutoDimTimerActive, KbdAutoDimActive, KbdAutoDimTime`
 
 It is activated setting the  property `KbdAutoDimTimerActive` to true, or false for deactivate it.
-The property `KbdAutoDimActive` is used to control whether the keyboard backlight will be dimmed, setting to true, or tuned off, setting to false, after the waiting time is elapsed.
+The property `KbdAutoDimActive` is used to control whether the keyboard backlight will be dimmed, setting to true, or turned off, setting to false, after the waiting time is elapsed.
 The waiting time is set with `KbdAutoDimTime`. The number must be in the range from 5 to 1800 (seconds).
 
 Therefore, if the AutoDim is activated with `KbdAutoDimTimerActive = true`, the keyboard backlight is automatically reduced at the minimum with `KbdAutoDimActive = true`, or completely turned OFF with `KbdAutoDimActive = false`, after the wait time `KbdAutoDimTime`. Pressing any key (Ctrl, Command & Option keys excluded) the backlight intensity is restored.
