@@ -45,12 +45,10 @@
 #define KBD_L2_LEVEL        96      //Default backlight index 2 value
 #define KBD_L3_LEVEL        248     //Default backlight index 3 value
 
-#define super IOService
-
 // Our ClevoService Class...
 class EXPORT ClevoService : public IOService
 {
-    //OSDeclareDefaultStructors(ClevoService)
+    OSDeclareDefaultStructors(ClevoService)
     
 public:
 	virtual bool        init(OSDictionary *dictionary = 0) override;
@@ -89,7 +87,7 @@ static  IOACPIPlatformDevice          * device;
         KeyboardEventCallback           origCallback;
         KeyboardSpecialEventCallback    origSpecialCallback;
         UInt32                          gKBLT, gKBDTime;
-        Boolean                         gKBDIsOFF, gKBDimmed, gDimTimerActive, gJustDim;
+        Boolean                         gKBDIsOFF, gKBDimmed, gDimTimerActive, gJustDim, gInit;
 
 
 void logAction(OSObject *,unsigned,unsigned,unsigned,unsigned,
