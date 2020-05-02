@@ -1,5 +1,8 @@
 ClevoService Changelog
 ================================
+#### v1.1.1
+- fixed rare conflict with BIOS backlight cycle at boot which sum colours instead of replacing
+
 #### v1.1.0
 - Fully customizable
 - Added Keyboard AutoDim feature
