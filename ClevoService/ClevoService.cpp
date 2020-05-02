@@ -18,7 +18,6 @@ bool ClevoService::init(OSDictionary * dict)
     gKBDIsOFF       = false;
     gDimTimerActive = true;
     gJustDim        = true;
-    gInit           = true;
 
     origCallback        = NULL;
     origSpecialCallback = NULL;
@@ -37,9 +36,9 @@ IOService* ClevoService::probe(IOService * provider, SInt32 * score)
     IOService *result = IOService::probe(provider, score);
     
     //Check our SSDT methods...
-    IOACPIPlatformDevice* pDevice = OSDynamicCast(IOACPIPlatformDevice, provider);
-    if (kIOReturnSuccess != pDevice->validateObject("CLVE")) {
-        IOLog( "%s: SSDT method CLVE not found\n", pDevice->getName() );
+    device = OSDynamicCast(IOACPIPlatformDevice, provider);
+    if (kIOReturnSuccess != device->validateObject(ACPI_METD_NAME)) {
+        IOLog( "%s: SSDT method CLVE not found\n", device->getName() );
         return NULL;
     }
     return result;
@@ -51,7 +50,7 @@ bool ClevoService::start(IOService * provider)
     
     DEBUG_LOG( "%s: Starting...\n", getName() );
     
-    device = OSDynamicCast(IOACPIPlatformDevice, provider);
+    //device = OSDynamicCast(IOACPIPlatformDevice, provider);
     if (device == NULL || !IOService::start(provider)) return false;
     
     setName("ClevoService");
@@ -100,6 +99,16 @@ bool ClevoService::start(IOService * provider)
     //The standard _INI method turn OFF dual GPU RX2070 & airplane led (used for Shift-lock indication)
     //Remove from SSDT if not necessary...
     gOldKBLT = gKBLT;
+    
+    //At boot, BIOS starts a cycle backloght: it may conflict adding our colour instead replacing...
+    //SetUp KBD backlight
+    ACPI_Send(0, SET_KB_LED, 0x10000000); // Reset...
+    IOSleep(50);
+    ACPI_Send(0, SET_KB_LED, 0xE0003001); // OFF
+    IOSleep(50);
+    kbdLightLevel(gKBLT & 3);   // Set backlight level...
+    kbdSetColor();              // Set backlight color...
+    kbdONOFF();                 // Turn backlight on/off...
 
     gKBDService = this;
     
@@ -128,8 +137,8 @@ bool ClevoService::start(IOService * provider)
     setProperty("KbdDimmingLevel", gKBDDimmingLevel, 8 * sizeof(UInt8));
     
     OSArray * levelsArray = new OSArray();
-    levelsArray->initWithCapacity(1);
     if (levelsArray != NULL) {
+        levelsArray->initWithCapacity(1);
         for (UInt8 i = 0; i < 4; i++) {
             OSNumber * myNum = OSNumber::withNumber(gKBDLevel[i], 8);
             if (myNum) levelsArray->setObject(i, myNum);
@@ -139,9 +148,6 @@ bool ClevoService::start(IOService * provider)
     }
     
     registerService(0);
-    
-    //SetUp KBD backlight
-    gKBDTimer->setTimeoutMS(3000);
 
     IOLog( "%s: AutoDim %s\n", getName(), (gDimTimerActive ? "activated" : "not activated") );
     IOLog( "%s: AutoDim %s\n", getName(), (gJustDim ? "dimming activated" : "OFF activated") );
@@ -248,7 +254,10 @@ void ClevoService::ACPI_Send(uint32_t arg0, uint32_t arg1, uint32_t arg2)
     params[0] = OSNumber::withNumber(arg0, 8 * sizeof(uint32_t));
     params[1] = OSNumber::withNumber(arg1, 8 * sizeof(uint32_t));
     params[2] = OSNumber::withNumber(arg2, 8 * sizeof(uint32_t));
-    device->evaluateObject("CLVE", NULL, params, 3); // Call our method...
+    if (device != NULL)
+        device->evaluateObject("CLVE", NULL, params, 3); // Call our method...
+    else
+        DEBUG_LOG( "%s: device NULL!\n", getName() );
 }
 
 
@@ -462,20 +471,15 @@ void ClevoService::kbdClearKeyboards()
 
 void ClevoService::kbdTimerFired(void)
 {
-    if (gInit) {
-        gKBDService->kbdSetUpBacklight(0);
-        gInit = false;
+    if (gJustDim) {
+        gKBDimmed = true;
+        ACPI_Send(0, SET_KB_LED, 0xF4000000 | gKBDDimmingLevel); // Reducing backlight at minimum...
+        DEBUG_LOG( "%s: gKBDTimer Fired -> Keyboard Dimmed\n", getName() );
     } else {
-        if (gJustDim) {
-            gKBDimmed = true;
-            ACPI_Send(0, SET_KB_LED, 0xF4000000 | gKBDDimmingLevel); // Reducing backlight at minimum...
-            DEBUG_LOG( "%s: gKBDTimer Fired -> Keyboard Dimmed\n", getName() );
-        } else {
-            gKBDimmed = false;
-            gKBLT &= 0xFFEF;  //OFF
-            kbdONOFF();
-            DEBUG_LOG( "%s: gKBDTimer Fired -> Keyboard Backlight OFF\n", getName() );
-        }
+        gKBDimmed = false;
+        gKBLT &= 0xFFEF;  //OFF
+        kbdONOFF();
+        DEBUG_LOG( "%s: gKBDTimer Fired -> Keyboard Backlight OFF\n", getName() );
     }
 }
 
@@ -556,7 +560,6 @@ OSObject* ClevoService::translateArray(OSArray* array)
         result = dict;
     }
     
-    // Note: result is retained when returned...
     return result;
 }
 

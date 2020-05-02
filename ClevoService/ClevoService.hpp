@@ -35,8 +35,9 @@
 #define msgKbdToggleONOFF   0x9F
 
 #define NVRAM_WAIT_TIME     3000    //3 secs. Time is in mS
-#define ACPI_CONF_NAME      "CONF"
-#define KBD_VAR_NAME        "KBLT"
+#define ACPI_METD_NAME      "CLVE"  //Our ACPI method name
+#define ACPI_CONF_NAME      "CONF"  //Configuration package name
+#define KBD_VAR_NAME        "KBLT"  //ACPI backlight var name
 #define KBD_ON_MASK         0x10
 #define KBD_DEF_TIME        180000  //Default 3 minutes. Time is in mS
 #define KBD_DIM_LEVEL       5       //Default backlight value when auto dimmed
@@ -87,7 +88,7 @@ static  IOACPIPlatformDevice          * device;
         KeyboardEventCallback           origCallback;
         KeyboardSpecialEventCallback    origSpecialCallback;
         UInt32                          gKBLT, gKBDTime;
-        Boolean                         gKBDIsOFF, gKBDimmed, gDimTimerActive, gJustDim, gInit;
+Boolean                         gKBDIsOFF, gKBDimmed, gDimTimerActive, gJustDim;//, gInit;
 
 
 void logAction(OSObject *,unsigned,unsigned,unsigned,unsigned,
