@@ -1,10 +1,13 @@
-#include "ClevoService.hpp"
+#include <ClevoService.hpp>
 
 OSDefineMetaClassAndStructors(ClevoService, IOService)
+
+#pragma mark ---------- Main Kernel Routines ----------
 
 bool ClevoService::init(OSDictionary * dict)
 {
     bool result = IOService::init(dict);
+    
     device          = NULL;
     gWorkLoop       = NULL;
     gNVRAMTimer     = NULL;
@@ -13,11 +16,13 @@ bool ClevoService::init(OSDictionary * dict)
     gKBDInUse       = 0;
     gKBLT           = 0;
     gOldKBLT        = 0;
+    vendorID        = 0;
     notify          = NULL;
     gKBDService     = NULL;
     gKBDIsOFF       = false;
     gDimTimerActive = true;
-    gJustDim        = true;
+    gKBDimmed       = true;
+    gKBDJustDim     = true;
 
     origCallback        = NULL;
     origSpecialCallback = NULL;
@@ -27,7 +32,7 @@ bool ClevoService::init(OSDictionary * dict)
     gKBDLevel[1]     = KBD_L1_LEVEL;
     gKBDLevel[2]     = KBD_L2_LEVEL;
     gKBDLevel[3]     = KBD_L3_LEVEL;
-
+    
     return result;
 }
 
@@ -41,20 +46,29 @@ IOService* ClevoService::probe(IOService * provider, SInt32 * score)
         IOLog( "%s: SSDT method CLVE not found\n", device->getName() );
         return NULL;
     }
+    
     return result;
 }
 
 bool ClevoService::start(IOService * provider)
 {
-    char    name[5];
-    
     DEBUG_LOG( "%s: Starting...\n", getName() );
     
     //device = OSDynamicCast(IOACPIPlatformDevice, provider);
     if (device == NULL || !IOService::start(provider)) return false;
     
-    setName("ClevoService");
-
+    setName( "ClevoService" );
+    setVendorID( ClevoVendorSTR );
+    
+    /*
+    //Not too early KB on, we just wait for DisplayMangler...
+    if (RunningKernel() >= MakeKernelVersion(17,0,0)) {
+        waitForMatchingService(serviceMatching("IODisplayWrangler"));
+    } else {
+        IOSleep(3000);
+    }
+    */
+    
     gWorkLoop = getWorkLoop();
     if (gWorkLoop == NULL) return false;
     gWorkLoop->retain();
@@ -76,45 +90,32 @@ bool ClevoService::start(IOService * provider)
 
     //Trying to read KBLT variable from NVRAM...
     if (IORegistryEntry *nvram = OSDynamicCast(IORegistryEntry, fromPath("/options", gIODTPlane))) {
-        
-        strlcpy(name, KBD_VAR_NAME, sizeof(name));
-        const OSSymbol *tempName = OSSymbol::withCString(name);
-        
         bool genericNVRAM = (0 == strncmp(nvram->getName(), "AppleNVRAM", sizeof("AppleNVRAM")));
+        OSObject* obj = NULL;
         if (genericNVRAM) {
-            nvram->IORegistryEntry::setProperty(tempName, OSData::withBytes(&gKBLT, sizeof(UInt32)));
+            obj = nvram->IORegistryEntry::getProperty(KBD_VAR_NAME);
         } else {
-            if (OSData *myData = OSDynamicCast(OSData, nvram->getProperty(tempName)))
-            {
-                int length = myData->getLength();
-                if (length > 0) {
-                    bcopy(myData->getBytesNoCopy(), &gKBLT, length);
-                }
+            obj = nvram->getProperty(KBD_VAR_NAME);
+        }
+        if (obj != NULL) {
+            if (OSData* number = OSDynamicCast(OSData, obj)) {
+                int length = number->getLength();
+                if (length > 0) bcopy(number->getBytesNoCopy(), &gKBLT, length);
             }
         }
-        OSSafeReleaseNULL(tempName);
         OSSafeReleaseNULL(nvram);
     }
     
     //The standard _INI method turn OFF dual GPU RX2070 & airplane led (used for Shift-lock indication)
     //Remove from SSDT if not necessary...
     gOldKBLT = gKBLT;
-    
-    //At boot, BIOS starts a cycle backloght: it may conflict adding our colour instead replacing...
-    //SetUp KBD backlight
-    ACPI_Send(0, SET_KB_LED, 0x10000000); // Reset...
-    IOSleep(50);
-    ACPI_Send(0, SET_KB_LED, 0xE0003001); // OFF
-    IOSleep(50);
-    kbdLightLevel(gKBLT & 3);   // Set backlight level...
-    kbdSetColor();              // Set backlight color...
-    kbdONOFF();                 // Turn backlight on/off...
-
-    gKBDService = this;
-    
     //We're going to get user's configuration...
     loadConfiguration();
-    
+    //Set-up backlight...
+    kbdSetUpBacklight();
+
+    gKBDService = this;
+
     loggedKeyboards = new OSArray();
     loggedKeyboards->initWithCapacity(1);
     
@@ -130,12 +131,21 @@ bool ClevoService::start(IOService * provider)
                                      (IOServiceMatchingNotificationHandler) &ClevoService::kbdNotificationHandler,
                                      this, 0);
     
-    setProperty(KBD_VAR_NAME, gKBLT, 8 * sizeof(UInt32));    
-    setProperty("KbdAutoDimActive", gJustDim);
+    setProperty(KBD_VAR_NAME, gKBLT, 8 * sizeof(gKBLT));
+    setProperty("KbdAutoDimActive", gKBDJustDim);
     setProperty("KbdAutoDimTimerActive", gDimTimerActive);
-    setProperty("KbdAutoDimTime", gKBDTime, 8 * sizeof(UInt32));
-    setProperty("KbdDimmingLevel", gKBDDimmingLevel, 8 * sizeof(UInt8));
-    
+    setProperty("KbdAutoDimTime", gKBDTime, 8 * sizeof(gKBDTime));
+    setProperty("KbdDimmingLevel", gKBDDimmingLevel, 8 * sizeof(gKBDDimmingLevel));
+ 
+    extern kmod_info_t kmod_info;
+    char buf[128];
+#ifdef DEBUG
+    snprintf(buf, sizeof(buf), "FJHK Debug %s", kmod_info.version);
+#else
+    snprintf(buf, sizeof(buf), "FJHK Release %s", kmod_info.version);
+#endif
+    setProperty("Version", buf);
+
     OSArray * levelsArray = new OSArray();
     if (levelsArray != NULL) {
         levelsArray->initWithCapacity(1);
@@ -150,7 +160,7 @@ bool ClevoService::start(IOService * provider)
     registerService(0);
 
     IOLog( "%s: AutoDim %s\n", getName(), (gDimTimerActive ? "activated" : "not activated") );
-    IOLog( "%s: AutoDim %s\n", getName(), (gJustDim ? "dimming activated" : "OFF activated") );
+    IOLog( "%s: AutoDim %s\n", getName(), (gKBDJustDim ? "dimming activated" : "OFF activated") );
     IOLog( "%s: Backlighting activated: KBLT=0x%x", getName(), gKBLT);
     
     return true;
@@ -216,15 +226,23 @@ IOReturn ClevoService::message(UInt32 type, IOService * provider, void * argumen
         myMsg = (UInt32 *)argument;
         switch (*myMsg) {
             case msgKbdChangeColor:
-                gKBLT &= 0xFF;
-                if (color < 0x800) gKBLT |= (color + 0x100);
-                kbdSetColor();
+                if (!gKBDIsOFF) {
+                    gKBLT &= 0xFF;
+                    if (color < 0x800) gKBLT |= (color + 0x100);
+                    kbdSetColor();
+                }
                 break;
             case msgKbdLightDOWN:
-                if (level) kbdLightLevel(--level);
+                if (!gKBDIsOFF) {
+                    if (level) kbdLightLevel(--level);
+                    sendUserLandMessage( evtKeyboardBacklight, level + 1, 4 );
+                }
                 break;
              case msgKbdLightUP:
-                if (level < 3) kbdLightLevel(++level);
+                if (!gKBDIsOFF) {
+                    if (level < 3) kbdLightLevel(++level);
+                    sendUserLandMessage( evtKeyboardBacklight, level + 1, 4 );
+                }
                 break;
             case msgKbdToggleONOFF:
                 if (!gKBDIsOFF) {
@@ -234,9 +252,17 @@ IOReturn ClevoService::message(UInt32 type, IOService * provider, void * argumen
                     gKBLT |= KBD_ON_MASK;
                     gKBDIsOFF = false;
                 }
+                sendUserLandMessage( evtKeyboardBacklight, !gKBDIsOFF ? level + 1 : 0, 4 );
             case msgKbdWakeUp:
-                kbdSetUpBacklight(0);
+                kbdSetUpBacklight();
                 break;
+            case msgAirplane:
+                sendUserLandMessage( evtAirplaneMode, 0, 0 );
+                break;
+#if DEBUG
+            default:
+                sendUserLandMessage( 3, *myMsg & 0xFFFF, 0 );
+#endif
         }
         if (gNVRAMTimer != NULL) {
             gNVRAMTimer->cancelTimeout();
@@ -246,7 +272,7 @@ IOReturn ClevoService::message(UInt32 type, IOService * provider, void * argumen
     return IOService::message(type, provider, argument);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#pragma mark ---------- Service Routines ----------
 
 void ClevoService::ACPI_Send(uint32_t arg0, uint32_t arg1, uint32_t arg2)
 {
@@ -263,44 +289,66 @@ void ClevoService::ACPI_Send(uint32_t arg0, uint32_t arg1, uint32_t arg2)
 
 void ClevoService::saveNVRAM(void)
 {
-    bool    genericNVRAM;
-    char    name[5];
-    
     gKBLT &= 0xF13;
     if (gOldKBLT != gKBLT) {
         if (IORegistryEntry *nvram = OSDynamicCast(IORegistryEntry, fromPath("/options", gIODTPlane))) {
-            strlcpy(name, KBD_VAR_NAME, sizeof(name));
-            const OSSymbol *tempName = OSSymbol::withCString(name);
-            
-            if ((genericNVRAM = (0 == strncmp(nvram->getName(), "AppleNVRAM", sizeof("AppleNVRAM")))))
-                DEBUG_LOG("%s: fallback to generic NVRAM methods\n", getName());
-            
+
+            bool genericNVRAM = (0 == strncmp(nvram->getName(), "AppleNVRAM", sizeof("AppleNVRAM")));
             if (genericNVRAM) {
-                nvram->IORegistryEntry::setProperty(tempName, OSData::withBytes(&gKBLT, sizeof(UInt32)));
-            } else {
-                nvram->setProperty(tempName, OSData::withBytes(&gKBLT, sizeof(UInt32)));
-            }
-            
-            OSSafeReleaseNULL(tempName);
+                nvram->IORegistryEntry::setProperty(KBD_VAR_NAME, &gKBLT, sizeof(gKBLT));
+                DEBUG_LOG("%s: fallback to generic NVRAM methods\n", getName());
+            } else
+                nvram->setProperty(KBD_VAR_NAME, &gKBLT, sizeof(gKBLT));
             OSSafeReleaseNULL(nvram);
             
             gOldKBLT = gKBLT;
-            
-            this->setProperty(KBD_VAR_NAME, gKBLT, 8 * sizeof(UInt32));
+            this->setProperty(KBD_VAR_NAME, gKBLT, 8 * sizeof(gKBLT));
             IOLog("%s: NVRAM saved KBLT=0x%x", getName(), gKBLT);
         }
     }
 }
 
+bool ClevoService::setVendorID(const char *vendorCode) {
+    if (KERN_SUCCESS != kev_vendor_code_find(vendorCode, &vendorID)) {
+        DEBUG_LOG("%s: setVendorID error\n", getName());
+        return false;
+    }
+    return true;
+}
 
-//TODO: ---------- Keyboard Backlight Routines ----------
+bool ClevoService::sendUserLandMessage( int type, int param1, int param2 ) {
+    // kernel event message
+    struct kev_msg kEventMsg = {0};
+    bzero(&kEventMsg, sizeof(struct kev_msg));
+    
+    kEventMsg.vendor_code = vendorID;   // set vendor code
+    if (vendorID == 0) DEBUG_LOG("%s: vendorID not set\n", getName());
+    
+    kEventMsg.kev_class    = KEV_ANY_CLASS;
+    kEventMsg.kev_subclass = KEV_ANY_SUBCLASS;
+    kEventMsg.event_code   = ClevoEventCode;
+   
+    kEventMsg.dv[0].data_length = sizeof(int);
+    kEventMsg.dv[0].data_ptr    = &type;
+    kEventMsg.dv[1].data_length = sizeof(int);
+    kEventMsg.dv[1].data_ptr    = &param1;
+    kEventMsg.dv[2].data_length = sizeof(int);
+    kEventMsg.dv[2].data_ptr    = &param2;
+    
+    if (KERN_SUCCESS != kev_msg_post( &kEventMsg )) {
+        DEBUG_LOG("%s: sendUserLandMessage error\n", getName());
+        return false;
+    }
+    return true;
+}
 
-void ClevoService::kbdSetUpBacklight(UInt32 newKBLT)
+#pragma mark ---------- Keyboard Backlight Routines ----------
+
+void ClevoService::kbdSetUpBacklight()
 {
-    if (newKBLT) gKBLT = newKBLT;   //We're forcing a new set
     if (gKBLT & KBD_ON_MASK) {      //...no need level or colour if we're off
         kbdSetColor();              //Set backlight color...
-        kbdLightLevel(gKBLT & 3);   //Set backlight level...
+        kbdLightLevel(gKBLT);       //Set backlight level...
     }
     kbdONOFF();                     //Turn backlight on/off...
 }
@@ -312,8 +360,6 @@ void ClevoService::kbdONOFF()
         ACPI_Send(0, SET_KB_LED, 0xE007F001); // ON
         if (gKBDTimer != NULL) gKBDTimer->setTimeoutMS(gKBDTime);
     } else {
-        //ACPI_Send(0, SET_KB_LED, 0xF4000008); // Reducing light...
-        //IOSleep(150);
         if (gKBDTimer != NULL) gKBDTimer->cancelTimeout();
         ACPI_Send(0, SET_KB_LED, 0xE0003001); // OFF
     }
@@ -324,8 +370,8 @@ void ClevoService::kbdSetColor(void)
 {
     UInt32  newColor = 0, color = gKBLT & 0xF00;
     
-    ACPI_Send(0, SET_KB_LED, 0x10000000);
-    
+    //ACPI_Send(0, SET_KB_LED, 0x10000000);
+
     switch (color) {
         case 0x0:   newColor = 0x00FF0000; break; // Blue
         case 0x100: newColor = 0x0000FF00; break; // Red
@@ -349,6 +395,7 @@ void ClevoService::kbdSetColor(void)
         ACPI_Send(0, SET_KB_LED, 0xF2000000 | newColor);
     }
 }
+
 
 void ClevoService::kbdLightLevel( UInt8 newLevel )
 {
@@ -413,7 +460,7 @@ bool ClevoService::kbdNotificationHandler(void * target, void * refCon,
         return false;
     }
     
-    IOService*    targetServ = OSDynamicCast( IOService, keyboard->_keyboardEventTarget );
+    IOService * targetServ = OSDynamicCast( IOService, keyboard->_keyboardEventTarget );
     if (targetServ)
     {
         DEBUG_LOG( "%s: Keyboard event target is %s\n", self->getName(), targetServ->getName());
@@ -471,19 +518,15 @@ void ClevoService::kbdClearKeyboards()
 
 void ClevoService::kbdTimerFired(void)
 {
-    if (gJustDim) {
-        gKBDimmed = true;
-        ACPI_Send(0, SET_KB_LED, 0xF4000000 | gKBDDimmingLevel); // Reducing backlight at minimum...
-        DEBUG_LOG( "%s: gKBDTimer Fired -> Keyboard Dimmed\n", getName() );
-    } else {
-        gKBDimmed = false;
-        gKBLT &= 0xFFEF;  //OFF
-        kbdONOFF();
-        DEBUG_LOG( "%s: gKBDTimer Fired -> Keyboard Backlight OFF\n", getName() );
-    }
+    gKBDimmed = true;
+    UInt32  cmd = 0xF4000000;
+    if (gKBDJustDim) cmd |= gKBDDimmingLevel;
+    ACPI_Send(0, SET_KB_LED, cmd); // Dimming...
+    DEBUG_LOG( "%s: gKBDTimer Fired -> Keyboard %s\n", getName(), gKBDJustDim ? "Dimmed" : "OFF");
 }
 
-//TODO: ---------- User Configuration Routines -------------
+
+#pragma mark ---------- User Configuration Routines -------------
 
 OSObject* ClevoService::translateEntry(OSObject* obj)
 {
@@ -585,10 +628,10 @@ void ClevoService::loadConfiguration()
     }
 
     OSBoolean * osBool = OSDynamicCast(OSBoolean, config->getObject("KbdAutoDimTimerActive"));
-    if (osBool) gDimTimerActive = osBool->isTrue() ? true : false;
+    if (osBool) gDimTimerActive = osBool->isTrue();
     
     osBool = OSDynamicCast(OSBoolean, config->getObject("KbdAutoDimActive"));
-    if (osBool) gJustDim = osBool->isTrue() ? true : false;
+    if (osBool) gKBDJustDim = osBool->isTrue();
     
     OSNumber * osNum = OSDynamicCast(OSNumber, config->getObject("KbdAutoDimTime"));
     if (osNum) {
@@ -610,13 +653,13 @@ void ClevoService::loadConfiguration()
         DEBUG_LOG( "%s: KbdLevels array not found\n", getName() );
 
     osNum = OSDynamicCast(OSNumber, config->getObject("KbdDimmingLevel"));
-    if (osNum) gKBDDimmingLevel = osNum->unsigned8BitValue();
+    if (osNum) gKBDDimmingLevel = osNum->unsigned8BitValue() & 0xF; // Limiting to 0xF
     
     OSSafeReleaseNULL(config);
     DEBUG_LOG( "%s: Configuration Succesfully Loaded\n", getName() );
  }
 
-//TODO: ---------- Keyboard Logger Actions -------------
+#pragma mark ---------- Keyboard Logger Actions -------------
 
 void specialAction(OSObject * target,
                    /* eventType */        unsigned   eventType,
@@ -629,14 +672,15 @@ void specialAction(OSObject * target,
                    OSObject * sender,
                    void * refcon __unused)
 {
-    // only sign of a logout (also thrown when sleeping)
+    DEBUG_LOG( "%s: SpecialAction called with eventType %d\n", gKBDService->getName(), eventType );
+    
+    // only sign of a logout (also thrown when sleeping
     if ((eventType == NX_SYSDEFINED) && (!flags) && (key == NX_NOSPECIALKEY))
         gKBDService->kbdClearKeyboards();
     
     if (origSpecialCallback)
         (* origSpecialCallback)(target, eventType, flags, key, flavor, guid, repeat, ts, sender, 0);
 }
-
 
 void logAction(OSObject * target,
                /* eventFlags  */      unsigned   eventType,
@@ -652,18 +696,20 @@ void logAction(OSObject * target,
                OSObject * sender,
                void * refcon __unused)
 {
-    if (gDimTimerActive && !gKBDIsOFF && (eventType == NX_KEYDOWN) && gKBDService) {
+    DEBUG_LOG( "%s: LogAction called with eventType %d\n", gKBDService->getName(), eventType );
+    
+    bool kbdEvtFlag = (eventType == NX_KEYDOWN) || (eventType == NX_FLAGSCHANGED);
+    
+    if (gDimTimerActive && !gKBDIsOFF && kbdEvtFlag && gKBDService) {
+        
         if (gKBDTimer != NULL) {
             gKBDTimer->cancelTimeout();
-            gKBDTimer->setTimeoutMS(gKBDTime);
+            gKBDTimer->setTimeoutMS( gKBDTime );
             DEBUG_LOG( "%s: Key Down, Timer Reloaded %d mS\n", gKBDService->getName(), gKBDTime );
             
-            if (gJustDim) {
-                if (gKBDimmed) gKBDService->kbdLightLevel(gKBLT);
+            if (gKBDimmed && (gKBLT & KBD_ON_MASK)) {
+                gKBDService->kbdSetUpBacklight();
                 gKBDimmed = false;
-            } else if (!(gKBLT & KBD_ON_MASK)) {
-                gKBLT |= KBD_ON_MASK;  //ON
-                gKBDService->kbdSetUpBacklight( 0 );
             }
         }
     };
