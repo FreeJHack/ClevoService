@@ -9,7 +9,55 @@
 /* Begin PBXBuildFile section */
 		5214FDAD230FF3A200E33053 /* ClevoService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5214FDAA230FF3A100E33053 /* ClevoService.cpp */; };
 		5214FDAE230FF3A200E33053 /* ClevoService.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5214FDAB230FF3A200E33053 /* ClevoService.hpp */; };
+		523BD5A0247671940080B129 /* ClevoServiceAgent in CopyFiles */ = {isa = PBXBuildFile; fileRef = 526EE3582475E33A00C378D6 /* ClevoServiceAgent */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		523BD5A3247671E50080B129 /* com.fjhk.ClevoService.agent.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = 524BF39F2475E27D00FE294D /* com.fjhk.ClevoService.agent.plist */; };
+		5240E1CB24766FDE00F00505 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5240E1CA24766FDE00F00505 /* main.m */; };
+		526EE3632475E42F00C378D6 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526EE3622475E42F00C378D6 /* AppKit.framework */; };
+		526EE3652475E43B00C378D6 /* CoreWLAN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526EE3642475E43B00C378D6 /* CoreWLAN.framework */; };
+		526EE3672475E44700C378D6 /* IOBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526EE3662475E44700C378D6 /* IOBluetooth.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		523BD59E247671630080B129 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5214FD95230FF31800E33053 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 526EE3572475E33A00C378D6;
+			remoteInfo = ClevoServiceAgent;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		523BD5A1247671D40080B129 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				523BD5A3247671E50080B129 /* com.fjhk.ClevoService.agent.plist in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		526EE3562475E33A00C378D6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		529D7EB624744D8B00F8E485 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				523BD5A0247671940080B129 /* ClevoServiceAgent in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		5214FD9E230FF31800E33053 /* ClevoService.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClevoService.kext; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -18,6 +66,16 @@
 		5214FDAB230FF3A200E33053 /* ClevoService.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ClevoService.hpp; sourceTree = "<group>"; };
 		5214FDAF230FF43100E33053 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5214FDB0230FF43100E33053 /* SSDT-ClevoService.dsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "SSDT-ClevoService.dsl"; sourceTree = "<group>"; };
+		5240E1CA24766FDE00F00505 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		524BF39E2475E27D00FE294D /* install_agent.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install_agent.sh; sourceTree = "<group>"; };
+		524BF39F2475E27D00FE294D /* com.fjhk.ClevoService.agent.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.fjhk.ClevoService.agent.plist; sourceTree = "<group>"; };
+		524BF3A12475E27D00FE294D /* OSD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSD.h; sourceTree = "<group>"; };
+		524BF3A22475E27D00FE294D /* BezelServices.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BezelServices.h; sourceTree = "<group>"; };
+		526EE3582475E33A00C378D6 /* ClevoServiceAgent */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ClevoServiceAgent; sourceTree = BUILT_PRODUCTS_DIR; };
+		526EE3622475E42F00C378D6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		526EE3642475E43B00C378D6 /* CoreWLAN.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreWLAN.framework; path = System/Library/Frameworks/CoreWLAN.framework; sourceTree = SDKROOT; };
+		526EE3662475E44700C378D6 /* IOBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOBluetooth.framework; path = System/Library/Frameworks/IOBluetooth.framework; sourceTree = SDKROOT; };
+		52FB894B246C49CE0087A567 /* Changelog.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Changelog.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,6 +86,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		526EE3552475E33A00C378D6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				526EE3672475E44700C378D6 /* IOBluetooth.framework in Frameworks */,
+				526EE3652475E43B00C378D6 /* CoreWLAN.framework in Frameworks */,
+				526EE3632475E42F00C378D6 /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -35,9 +103,12 @@
 			isa = PBXGroup;
 			children = (
 				5214FDAF230FF43100E33053 /* README.md */,
+				52FB894B246C49CE0087A567 /* Changelog.md */,
 				5214FDB0230FF43100E33053 /* SSDT-ClevoService.dsl */,
 				5214FDA0230FF31800E33053 /* ClevoService */,
+				524BF39D2475E27D00FE294D /* ClevoServiceAgent */,
 				5214FD9F230FF31800E33053 /* Products */,
+				529D7EA52474472300F8E485 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -45,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				5214FD9E230FF31800E33053 /* ClevoService.kext */,
+				526EE3582475E33A00C378D6 /* ClevoServiceAgent */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -57,6 +129,28 @@
 				5214FDA9230FF3A100E33053 /* Info.plist */,
 			);
 			path = ClevoService;
+			sourceTree = "<group>";
+		};
+		524BF39D2475E27D00FE294D /* ClevoServiceAgent */ = {
+			isa = PBXGroup;
+			children = (
+				524BF39E2475E27D00FE294D /* install_agent.sh */,
+				524BF39F2475E27D00FE294D /* com.fjhk.ClevoService.agent.plist */,
+				524BF3A22475E27D00FE294D /* BezelServices.h */,
+				524BF3A12475E27D00FE294D /* OSD.h */,
+				5240E1CA24766FDE00F00505 /* main.m */,
+			);
+			path = ClevoServiceAgent;
+			sourceTree = "<group>";
+		};
+		529D7EA52474472300F8E485 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				526EE3662475E44700C378D6 /* IOBluetooth.framework */,
+				526EE3642475E43B00C378D6 /* CoreWLAN.framework */,
+				526EE3622475E42F00C378D6 /* AppKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -81,15 +175,35 @@
 				5214FD9A230FF31800E33053 /* Sources */,
 				5214FD9B230FF31800E33053 /* Frameworks */,
 				5214FD9C230FF31800E33053 /* Resources */,
+				529D7EB624744D8B00F8E485 /* CopyFiles */,
+				523BD5A1247671D40080B129 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				523BD59F247671630080B129 /* PBXTargetDependency */,
 			);
 			name = ClevoService;
 			productName = ClevoService;
 			productReference = 5214FD9E230FF31800E33053 /* ClevoService.kext */;
 			productType = "com.apple.product-type.kernel-extension";
+		};
+		526EE3572475E33A00C378D6 /* ClevoServiceAgent */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 526EE35C2475E33A00C378D6 /* Build configuration list for PBXNativeTarget "ClevoServiceAgent" */;
+			buildPhases = (
+				526EE3542475E33A00C378D6 /* Sources */,
+				526EE3552475E33A00C378D6 /* Frameworks */,
+				526EE3562475E33A00C378D6 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ClevoServiceAgent;
+			productName = ClevoServiceAgent;
+			productReference = 526EE3582475E33A00C378D6 /* ClevoServiceAgent */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -97,10 +211,15 @@
 		5214FD95230FF31800E33053 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				DefaultBuildSystemTypeForWorkspace = Original;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = none;
 				TargetAttributes = {
 					5214FD9D230FF31800E33053 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					526EE3572475E33A00C378D6 = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
 				};
@@ -111,6 +230,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 5214FD94230FF31800E33053;
 			productRefGroup = 5214FD9F230FF31800E33053 /* Products */;
@@ -118,6 +238,7 @@
 			projectRoot = "";
 			targets = (
 				5214FD9D230FF31800E33053 /* ClevoService */,
+				526EE3572475E33A00C378D6 /* ClevoServiceAgent */,
 			);
 		};
 /* End PBXProject section */
@@ -141,7 +262,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		526EE3542475E33A00C378D6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5240E1CB24766FDE00F00505 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		523BD59F247671630080B129 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 526EE3572475E33A00C378D6 /* ClevoServiceAgent */;
+			targetProxy = 523BD59E247671630080B129 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		5214FDA4230FF31800E33053 /* Debug */ = {
@@ -174,9 +311,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -192,10 +328,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.11;
 			};
 			name = Debug;
 		};
@@ -229,9 +365,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -241,9 +376,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				SDKROOT = macosx10.11;
 			};
 			name = Release;
 		};
@@ -252,10 +387,11 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ClevoService/Info.plist;
 				MODULE_NAME = com.none.ClevoService;
-				MODULE_VERSION = 1.1.1;
+				MODULE_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.none.ClevoService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -268,14 +404,39 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ClevoService/Info.plist;
 				MODULE_NAME = com.none.ClevoService;
-				MODULE_VERSION = 1.1.1;
+				MODULE_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.none.ClevoService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
+		526EE35D2475E33A00C378D6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		526EE35E2475E33A00C378D6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -296,6 +457,15 @@
 			buildConfigurations = (
 				5214FDA7230FF31800E33053 /* Debug */,
 				5214FDA8230FF31800E33053 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		526EE35C2475E33A00C378D6 /* Build configuration list for PBXNativeTarget "ClevoServiceAgent" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				526EE35D2475E33A00C378D6 /* Debug */,
+				526EE35E2475E33A00C378D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
