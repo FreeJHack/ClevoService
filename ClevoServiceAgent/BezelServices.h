@@ -1,13 +1,3 @@
-//#include "ClevoService.hpp"
-
-//#import <CoreWLAN/CoreWLAN.h>
-//#import <CoreServices/CoreServices.h>
-//#import <sys/ioctl.h>
-//#import <sys/socket.h>
-//#import <sys/kern_event.h>
-//#import "BezelServices.h"
-//#import "OSD.h"
-//#include <dlfcn.h>
 
 #include <stdio.h>
 #include <stdint.h>

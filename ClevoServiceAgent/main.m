@@ -1,7 +1,7 @@
 /*
  * main.m
  *
- * ClevoServiceDaemon
+ * ClevoServiceAgent
  *
 */
 
