@@ -41,7 +41,7 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
 
     Method (_WAK, 1, Serialized)
     {
-        If (Arg0 == 5) {Arg0 = 4}  //OSX also uses Arg0=5. Force 4 for _WAK compatibility...
+        If ((Arg0 == 0) || (Arg0 > 4)) {Arg0 = 3}  //OSX also uses Arg0=3. Force 3 for _WAK compatibility...
         // Dual GPU OFF, remove it if not necessary
         \_SB.PCI0.PEG0.PEGP._OFF ()
         // After a sleep AFLT=1 means battery fail, we need to reset...
@@ -56,6 +56,12 @@ DefinitionBlock ("", "SSDT", 1, "hack ", "CLEVO", 0x00000000)
 
     Scope (_SB.PCI0.LPCB.EC)
     {
+        Method (_Q14, 0, NotSerialized)  // _Qxx: EC Query
+        {
+            Notify (CLV0, 0x84) //Airplane key: switch-off Wifi & Bluetooth
+            Return (Zero)
+        }
+
         Method (_Q50, 0, NotSerialized)  // _Qxx: EC Query
         {
             Store (OEM4, Local0)
